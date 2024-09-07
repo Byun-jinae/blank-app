@@ -13,23 +13,26 @@ st.write("텍스트 프롬프트를 입력하고 AI 이미지를 생성하세요
 # 텍스트 입력
 prompt = st.text_input("프롬프트를 입력하세요:")
 
+
+# 이미지 사이즈 선택 옵션
+size_option = st.selectbox("이미지 사이즈를 선택하세요:", ["1024x1024", "1792x1024", "1024x1792"])
+
 if st.button("이미지 생성"):
     if prompt:
         try:
             kwargs = {
                 "prompt": prompt,
-                "n":1,
-                "size":"1024x1024"
+                "n": 2,  # 이미지 2장 생성
+                "size": size_option  # 선택한 이미지 사이즈 적용
             }
 
             # OpenAI API를 사용하여 이미지 생성
             response = client.images.generate(**kwargs)
 
-            # 응답에서 이미지 URL 추출
-            image_url = response.data[0].url
-
-            # 생성된 이미지 표시
-            st.image(image_url, caption="생성된 이미지", use_column_width=True)
+            # 응답에서 이미지 URL 추출 및 표시
+            for i, image_data in enumerate(response.data):
+                image_url = image_data.url
+                st.image(image_url, caption=f"생성된 이미지 {i+1}", use_column_width=True)
 
         except Exception as e:
             st.error(f"이미지 생성 중 오류 발생: {e}")
